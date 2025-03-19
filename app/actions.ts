@@ -3,6 +3,7 @@
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { prisma } from "./utils/db";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export async function handleSubmition(formData: FormData) {
   const { getUser } = getKindeServerSession();
@@ -16,7 +17,7 @@ export async function handleSubmition(formData: FormData) {
   const content = formData.get("content");
   const url = formData.get("url");
 
-  const data = await prisma.blogPost.create({
+  await prisma.blogPost.create({
     data: {
       title: title as string,
       content: content as string,
@@ -27,5 +28,6 @@ export async function handleSubmition(formData: FormData) {
     },
   });
 
+  revalidatePath("/");
   return redirect("/dashboard");
 }
